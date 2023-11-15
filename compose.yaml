@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+    php:
+        build: ./
+        container_name: application-php-apache-bullseye
+        restart: always
+        ports:
+            - 8080:80
+        links:
+            - database
+        volumes:
+            - ./:/var/www/html
+    database:
+        image: mariadb:10.6-focal
+        container_name: mariadb-focal
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: root_pass
+            MYSQL_DATABASE: application
+            MYSQL_USER: docker_user
+            MYSQL_PASSWORD: docker_pass
+    phpmyadmin:
+        image: phpmyadmin:5.0-apache
+        container_name: phpmyadmin-php-apache-buster
+        restart: always
+        links:
+            - database
+        ports:
+            - 8081:80    
+        environment:
+            PMA_HOST: database
+            PMA_USER: docker_user
+            PMA_PASSWORD: docker_pass
+        
