@@ -3,14 +3,21 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Model\Project;
+use App\Models\Project;
 
-class ProjectController extends Controller
+class ProjectsController extends Controller
 {
     public function index()
     {
         $projects = Project::all();
         return view('projects.index', compact('projects'));
+    }
+
+    public function show(Project $project)
+    {
+        // Route Model Binding
+        // $project = Project::findOrFail(request('project'));
+        return view('projects.show', compact('project'));
     }
 
     public function store()
