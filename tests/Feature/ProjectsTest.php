@@ -11,9 +11,19 @@ class ProjectsTest extends TestCase
     use WithFaker, RefreshDatabase;
 
     /** @test */
+    public function only_authenticated_users_can_create_projects()
+    {
+        $attributes = factory('App\Models\Project')->raw();
+
+        $this->post('/projects', $attributes)->assertRedirect('login');    
+    }
+
+    /** @test */
     public function a_user_can_create_a_project()
     {
         $this->withoutExceptionHandling();
+
+        $this->actingAs(factory('App\Models\User')->create());
 
         $attributes = [
             'title' => $this->faker->sentence,
@@ -34,7 +44,7 @@ class ProjectsTest extends TestCase
         $this->withoutExceptionHandling();
 
         $project = factory('App\Models\Project')->create();
-
+ 
         $this->get('/projects/' . $project->id)
             ->assertSee($project->title)
             ->assertSee($project->description);
@@ -43,6 +53,7 @@ class ProjectsTest extends TestCase
     /** @test */
     public function a_project_requires_a_title()
     {
+        $this->actingAs(factory('App\Models\User')->create());
         $attributes = factory('App\Models\Project')->raw(['title' => '']);
 
         $this->post('/projects', $attributes)->assertSessionHasErrors('title');
@@ -51,10 +62,10 @@ class ProjectsTest extends TestCase
     /** @test */
     public function a_project_requires_a_description()
     {
+        $this->actingAs(factory('App\Models\User')->create());
         $attributes = factory('App\Models\Project')->raw(['description' => '']);
 
         $this->post('/projects', $attributes)->assertSessionHasErrors('description');
-
     }
         
 }
